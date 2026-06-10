@@ -38,6 +38,7 @@
         :bookings="bookings"
         :notices="notices"
         @booking-created="handleBookingCreated"
+        @attraction-updated="handleAttractionUpdated"
       />
     </main>
   </div>
@@ -100,6 +101,18 @@ async function loadData() {
 async function handleBookingCreated(payload) {
   await travelApi.createBooking(payload);
   await loadData();
+}
+
+async function handleAttractionUpdated(updatedAttraction) {
+  const idx = attractions.value.findIndex((a) => a.id === updatedAttraction.id);
+  if (idx !== -1) {
+    attractions.value[idx] = updatedAttraction;
+  }
+  try {
+    routes.value = await travelApi.getRoutes();
+  } catch (err) {
+    error.value = `刷新线路数据失败：${err.message}`;
+  }
 }
 
 onMounted(loadData);
